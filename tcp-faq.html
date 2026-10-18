@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div style="font:13px system-ui,sans-serif;padding:6px 16px;background:#1d6fb8;color:#fff"><a href="./" style="color:#fff">← 返回目录</a></div>
+<title>FIT9137 TCP 题答疑</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;700&display=swap">
+<style>
+/* Layout: one reading column; a connection timeline up top, then one card per confusion, in Task 4 order */
+:root{
+  --bg:#eef2f5; --surface:#ffffff; --ink:#1b2530; --muted:#5b6b7a; --line:#d5dee6;
+  --accent:#1d6fb8; --accent-soft:#e3eef9; --good:#1b8549; --good-soft:#e5f4ea; --bad:#c4302b; --bad-soft:#fbe9e8;
+  --code-bg:#a8f0a0; --code-ink:#14301a; --hs:#fff3c4; --fin:#fde2e0;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12181e; --surface:#1a222b; --ink:#e3e9ef; --muted:#93a3b2; --line:#2d3945;
+  --accent:#6aaee8; --accent-soft:#1d2e40; --good:#5cc489; --good-soft:#18301f; --bad:#ef7a73; --bad-soft:#3a1f1e;
+  --code-bg:#24452a; --code-ink:#c9f2c4; --hs:#3a3418; --fin:#3d2321; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12181e; --surface:#1a222b; --ink:#e3e9ef; --muted:#93a3b2; --line:#2d3945;
+  --accent:#6aaee8; --accent-soft:#1d2e40; --good:#5cc489; --good-soft:#18301f; --bad:#ef7a73; --bad-soft:#3a1f1e;
+  --code-bg:#24452a; --code-ink:#c9f2c4; --hs:#3a3418; --fin:#3d2321; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65}
+.wrap{max-width:880px;margin:0 auto;padding:28px 16px 56px;display:grid;gap:18px}
+h1{font-size:25px;margin:0;text-wrap:balance}
+.lead{margin:4px 0 0;color:var(--muted)}
+section{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0;display:grid;gap:10px}
+h2{font-size:17px;margin:0;text-wrap:balance;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--accent);background:var(--accent-soft);padding:1px 8px;border-radius:99px;white-space:nowrap}
+.q{margin:0;color:var(--muted)}
+.q b{color:var(--ink)}
+p{margin:0}
+ol,ul{margin:0;padding-left:22px;display:grid;gap:4px}
+code{font-family:var(--f-mono);font-size:13px;background:var(--code-bg);color:var(--code-ink);padding:1px 6px;border-radius:4px}
+pre{margin:0;font-family:var(--f-mono);font-size:13px;line-height:1.7;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;letter-spacing:.04em;color:var(--muted);font-weight:600}
+td.m{font-family:var(--f-mono);font-size:13px;white-space:nowrap}
+tr.hs td{background:var(--hs)}
+tr.fin td{background:var(--fin)}
+.ok{color:var(--good);font-weight:700}
+.no{color:var(--bad);font-weight:700}
+.key{background:var(--good-soft);border-left:3px solid var(--good);padding:8px 12px;border-radius:0 6px 6px 0}
+.warn{background:var(--bad-soft);border-left:3px solid var(--bad);padding:8px 12px;border-radius:0 6px 6px 0}
+.ans{font-family:var(--f-mono);font-weight:600}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>FIT9137 TCP 题答疑</h1>
+    <p class="lead">Task 4 做题时遇到的问题，按题目顺序整理。数值来自第 1 套（apollo_eth0_practice_V1.pcap），Web = 61.143.77.112。</p>
+  </header>
+
+  <section>
+    <h2>先看全貌：Web 这条连接从头到尾</h2>
+    <div class="tw"><table>
+      <tr><th>No.</th><th>方向</th><th>Info 里的标志</th><th>Seq / Ack / Len</th><th>在干什么</th></tr>
+      <tr class="hs"><td class="m">143</td><td>Apollo → Web</td><td class="m">[SYN]</td><td class="m">Seq=0 Len=0</td><td>握手 1：“能连吗？”</td></tr>
+      <tr class="hs"><td class="m">144</td><td>Web → Apollo</td><td class="m">[SYN, ACK]</td><td class="m">Seq=0 Ack=1 Len=0</td><td>握手 2：“能，你收到我了吗？”</td></tr>
+      <tr class="hs"><td class="m">145</td><td>Apollo → Web</td><td class="m">[ACK]</td><td class="m">Seq=1 Ack=1 Len=0</td><td>握手 3：“收到”</td></tr>
+      <tr><td class="m">146</td><td>Apollo → Web</td><td class="m">GET / HTTP/1.1</td><td class="m">Seq=1 Len=138</td><td>开始带数据</td></tr>
+      <tr><td class="m">147</td><td>Web → Apollo</td><td class="m">[ACK]</td><td class="m">Ack=139</td><td>“GET 收到了”</td></tr>
+      <tr><td class="m">…</td><td>来回</td><td class="m">[PSH, ACK] / [ACK]</td><td class="m">大数</td><td>传网页和图片</td></tr>
+      <tr class="fin"><td class="m">232</td><td>Apollo → Web</td><td class="m">[FIN, ACK]</td><td class="m">Len=0</td><td>“我发完了”</td></tr>
+      <tr class="fin"><td class="m">233</td><td>Web → Apollo</td><td class="m">[FIN, ACK]</td><td class="m">Len=0</td><td>“我也发完了”</td></tr>
+      <tr><td class="m">234</td><td>Apollo → Web</td><td class="m">[ACK]</td><td class="m">Len=0</td><td>“好，关了”（没有 FIN）</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>怎么找到发往 Web 的帧 <span class="tag">4.1 前置</span></h2>
+    <ol>
+      <li>过滤栏输入 <code>ip.dst == 61.143.77.112</code>，回车。剩下的每一行都是发往 Web 的。</li>
+      <li>随便右键一行 → <b>Follow → TCP Stream</b>。</li>
+      <li>弹出对话内容窗口，点右下角 <b>Close</b>。</li>
+      <li>过滤栏自动变成 <code>tcp.stream eq 1</code>，列表里只剩这一条连接。</li>
+    </ol>
+    <p>随便选哪一行都行：发往 Web 的帧都属于同一条连接（Apollo 53139 → Web 80）。</p>
+  </section>
+
+  <section>
+    <h2>我的列表和图不一样，帧号跳着走 <span class="tag">排序</span></h2>
+    <p class="q"><b>现象：</b>只看到 143、145、146……少了 144 [SYN, ACK]。</p>
+    <p>原因是点过 Source 列的标题，列表按 Source 排序了：Apollo 发的帧排在前面，Web 回的帧都被排到下面。</p>
+    <p class="key">只要帧号不是从小到大，先点一下 <b>No.</b> 列标题，排回帧号顺序。</p>
+  </section>
+
+  <section>
+    <h2>SYN、ACK、PSH、FIN 各是什么意思 <span class="tag">概念</span></h2>
+    <p>它们是 TCP 头里的标志位。每个标志是一个开关，<b>set = 1</b>，表示这一帧带着这个意思。Info 方括号里写的就是打开了哪些开关。</p>
+    <div class="tw"><table>
+      <tr><th>标志</th><th>意思</th><th>打电话</th><th>在哪出现</th></tr>
+      <tr><td class="m">SYN</td><td>我要建立连接</td><td>“喂，听得到吗？”</td><td>只在握手前两帧</td></tr>
+      <tr><td class="m">ACK</td><td>确认收到对方的东西</td><td>“嗯，听到了”</td><td>除第一帧外几乎每帧都有</td></tr>
+      <tr><td class="m">PSH</td><td>这帧带数据，马上交给程序</td><td>正在说话</td><td>GET、网页、图片</td></tr>
+      <tr><td class="m">FIN</td><td>我这边发完了，要关连接</td><td>“我说完了”</td><td>只在结束时</td></tr>
+      <tr><td class="m">RST</td><td>强制断开</td><td>直接挂断</td><td>异常时</td></tr>
+    </table></div>
+    <p class="key">ACK 到处都有，单看它认不出什么。有辨识度的是 <b>SYN</b>（开头）、<b>FIN</b>（结尾），以及<b>不带 ACK 的 SYN</b>（每条连接只有一个）。</p>
+    <p><b>ACK 标志和 Ack 数字是两回事。</b>[ACK] 表示“这帧带了确认”；<code>Ack=139</code> 表示“前 138 个字节收到了，下一个要第 139 个”。例：146 的 GET 是 Seq=1、Len=138，Web 回的 147 就写 Ack=139。</p>
+  </section>
+
+  <section>
+    <h2>怎么确认是握手，而不只是“头三个” <span class="tag">4.1</span></h2>
+    <p class="q"><b>疑问：</b>160–163 也是 [PSH, ACK]、[ACK]、[ACK]，凭什么前三个才算握手？</p>
+    <ol>
+      <li><b>看 SYN。</b><code>tcp.stream eq 1 &amp;&amp; tcp.flags.syn == 1</code> 只剩 2 行：143 [SYN] 和 144 [SYN, ACK]。</li>
+      <li><b>第三帧</b>是紧跟在 [SYN, ACK] 后面、Apollo 发的 [ACK]：145，Seq=1 Ack=1 Len=0。</li>
+      <li><b>核对指纹：</b>Seq=0 → Seq=0 Ack=1 → Seq=1 Ack=1；方向是 Apollo → Web → Apollo；三帧 Len 都是 0。</li>
+    </ol>
+    <div class="tw"><table>
+      <tr><th>帧</th><th>标志</th><th>Seq / Ack / Len</th><th>为什么不是握手</th></tr>
+      <tr><td class="m">160</td><td class="m">[PSH, ACK]</td><td class="m">Seq=15497 Ack=463 Len=14480</td><td>没有 SYN；大数；Len≠0，在传图片</td></tr>
+      <tr><td class="m">161</td><td class="m">[ACK]</td><td class="m">Seq=463 Ack=29977 Len=0</td><td>没有 SYN；只是确认收到了上面那段</td></tr>
+    </table></div>
+    <p>答案：<span class="ans">143,144,145</span></p>
+  </section>
+
+  <section>
+    <h2>“all segments with the FIN flag set”为什么用 fin == 1 <span class="tag">4.4</span></h2>
+    <p class="q"><b>疑问：</b>题目说 all segments，为什么不是所有帧，还要加 fin == 1？</p>
+    <ul>
+      <li><b>segment</b>：一个 TCP 包，就是列表里的一行。</li>
+      <li><b>with the FIN flag set</b>：带 FIN 标志的。<b>all</b> 是说这种帧有几个就全写上。</li>
+      <li><b>set = 1</b>。展开 TCP → Flags，能看到 <code>Fin: Set</code>（1）或 <code>Fin: Not set</code>（0），所以过滤器是 <code>tcp.flags.fin == 1</code>。</li>
+    </ul>
+    <p class="warn">只写 <code>tcp.flags.fin == 1</code> 会出 8 个：110,111（SMTP）、232,233（Web）、391,392（External）、546,547（Intranet）。Task 4 只问 Web 这条连接，要和 stream 条件一起用。</p>
+    <pre>tcp.stream eq 1 &amp;&amp; tcp.flags.fin == 1</pre>
+    <p>剩 2 行，两边各一个 [FIN, ACK]。答案：<span class="ans">232,233</span>。最后的 234 只有 [ACK]，不算。</p>
+  </section>
+
+  <section>
+    <h2>数连接数为什么只数“喂”，不数“听到了” <span class="tag">4.5</span></h2>
+    <p>“听到了”（SYN, ACK）和“喂”（SYN）属于同一通电话。两个都数，每条连接就被算了两次。</p>
+    <div class="tw"><table>
+      <tr><th>过滤器</th><th>剩几行</th><th>结果</th></tr>
+      <tr><td class="m">tcp.flags.syn == 1</td><td>8</td><td class="no">每条算两次 ✗</td></tr>
+      <tr><td class="m">tcp.flags.syn == 1 &amp;&amp; tcp.flags.ack == 0</td><td>4</td><td class="ok">每条只有一个开头 ✓</td></tr>
+    </table></div>
+    <p>核对：<b>Statistics → Conversations → TCP</b> 标签页，一行是一条连接，也是 4 行。答案：<span class="ans">4</span>（SMTP、Web、External、Intranet）。</p>
+  </section>
+
+  <section>
+    <h2>同组另外两题，顺带记 <span class="tag">4.2 · 4.3</span></h2>
+    <ul>
+      <li><b>4.2 Apollo 的源端口：</b>选 143 [SYN]，Info 开头写着 <code>53139 → 80</code>，左边那个就是。80 是 Web 的端口，不是答案。答案：<span class="ans">53139</span></li>
+      <li><b>4.3 第一个 SYN 的 raw 序号：</b>选 143，展开 TCP，Sequence Number 显示 0（相对值），下面一行 <b>Sequence Number (raw)</b> 才是答案：<span class="ans">217005200</span></li>
+    </ul>
+  </section>
+</div>
+
+</body>
+</html>
